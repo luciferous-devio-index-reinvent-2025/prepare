@@ -11,7 +11,7 @@ deploy:
 describe:
 	aws cloudformation describe-stacks \
 		--stack-name $$STACK_NAME \
-		--query Stacks[0].Output
+		--query Stacks[0].Outputs
 
 .PHONY: \
 	deploy \
