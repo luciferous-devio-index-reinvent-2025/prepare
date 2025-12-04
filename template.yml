@@ -1,0 +1,54 @@
+Parameters:
+  BucketName:
+    Type: String
+
+  OrganizationName:
+    Type: String
+
+Resources:
+  IamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:sub:
+                  - !Sub repo:${OrganizationName}/*
+                token.actions.githubusercontent.com:aud:
+                  - sts.amazonaws.com
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !Sub arn:aws:s3:::${BucketName}/${OrganizationName}/*
+
+  IamUser:
+    Type: AWS::IAM::User
+    Properties:
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub arn:aws:s3:::${BucketName}/${OrganizationName}/*
+
+Outputs:
+  IamRoleArn:
+    Value: !GetAtt IamRole.Arn
+
+  IamUserName:
+    Value: !Ref IamUser

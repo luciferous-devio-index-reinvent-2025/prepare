@@ -1,0 +1,4 @@
+export AWS_PROFILE=xxxx
+export STACK_NAME=xxxx
+export BUCKET_NAME=xxxx
+export GITHUB_ORGANIZATION=xxxx
